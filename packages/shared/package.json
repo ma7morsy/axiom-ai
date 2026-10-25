@@ -1,0 +1,9 @@
+{
+  "name": "@axiom/shared",
+  "version": "1.0.0",
+  "private": true,
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": { "typecheck": "tsc --noEmit", "test": "tsx --test src/*.test.ts" },
+  "devDependencies": { "tsx": "^4.19.0", "typescript": "~5.3.3" }
+}

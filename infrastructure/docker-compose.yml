@@ -1,0 +1,29 @@
+# Development / staging stack:  docker compose -f infrastructure/docker-compose.yml --env-file .env up --build
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: axiom
+      POSTGRES_USER: axiom
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-axiom}
+    volumes: [dbdata:/var/lib/postgresql/data]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U axiom"], interval: 5s, retries: 10 }
+    ports: ["5432:5432"]
+  api:
+    build: ../apps/api
+    depends_on: { db: { condition: service_healthy } }
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ENVIRONMENT:-Development}
+      ConnectionStrings__Default: Host=db;Database=axiom;Username=axiom;Password=${DB_PASSWORD:-axiom}
+      Jwt__Key: ${JWT_KEY:?set JWT_KEY (32+ chars)}
+      Security__EncryptionKey: ${ENCRYPTION_KEY:?set ENCRYPTION_KEY}
+      App__AllowRegistration: ${ALLOW_REGISTRATION:-false}
+      Cors__Origins: ${CORS_ORIGINS:-http://localhost:8081}
+      Storage__Path: /data/storage
+    volumes: [storage:/data/storage]
+    ports: ["5080:8080"]
+  web:
+    build: { context: .., dockerfile: apps/mobile/Dockerfile, args: { EXPO_PUBLIC_API_URL: "${PUBLIC_API_URL:-http://localhost:5080}" } }
+    depends_on: [api]
+    ports: ["8081:80"]
+volumes: { dbdata: {}, storage: {} }
