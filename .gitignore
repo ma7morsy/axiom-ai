@@ -1,0 +1,8 @@
+node_modules
+.env
+bin/
+obj/
+dist/
+.expo/
+apps/api/src/Chatbot.Api/storage/
+*.log
