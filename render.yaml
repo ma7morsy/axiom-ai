@@ -1,0 +1,32 @@
+# Render Blueprint: New > Blueprint > pick this repository. Creates the API and its Postgres database.
+databases:
+  - name: axiom-db
+    plan: free
+    databaseName: axiom
+    user: axiom
+
+services:
+  - type: web
+    name: axiom-api
+    runtime: docker
+    dockerContext: apps/api
+    dockerfilePath: apps/api/Dockerfile
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_URLS
+        value: http://+:10000
+      - key: ConnectionStrings__Default
+        fromDatabase:
+          name: axiom-db
+          property: connectionString
+      - key: Jwt__Key
+        generateValue: true
+      - key: Security__EncryptionKey
+        generateValue: true
+      - key: App__AllowRegistration
+        value: "false"
+      - key: Cors__Origins
+        sync: false   # you enter your Cloudflare Pages address when Render asks

@@ -1,0 +1,11 @@
+{
+  "name": "axiom",
+  "private": true,
+  "workspaces": ["apps/mobile", "packages/*"],
+  "scripts": {
+    "web": "npm run web --workspace apps/mobile",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "build:web": "npm run build:web --workspace apps/mobile",
+    "test": "npm test --workspaces --if-present"
+  }
+}
